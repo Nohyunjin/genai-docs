@@ -1,4 +1,4 @@
-import { fetchSchema } from '@/entities/docs/api/fetchSchema';
+import { fetchApiDoc } from '@/entities/docs/api/fetchSchema';
 import { ApiDoc } from '@/features/api-doc/ui/api-doc';
 import { notFound } from 'next/navigation';
 
@@ -15,13 +15,13 @@ export default function Page(props: Props) {
 
 async function DocPage({ params }: Props) {
   const { provider, model } = await params;
-  const schema = await fetchSchema(provider, model);
+  const apiDocData = await fetchApiDoc(provider, model);
 
-  if (!schema) {
+  if (!apiDocData) {
     notFound();
   }
 
-  return <ApiDoc schema={schema} />;
+  return <ApiDoc data={apiDocData} />;
 }
 
 export async function generateMetadata({ params }: Props) {

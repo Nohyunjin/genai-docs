@@ -5,16 +5,102 @@ import { CodeBlock, CodeLanguage } from '@/shared/ui/code-block';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
+// 데이터베이스에서 가져온 API 문서 데이터 타입
+interface ApiDocData {
+  id: string;
+  provider: string;
+  model: string;
+  title: string;
+  description: string;
+  endpoint: string;
+  method: string;
+  tags: string[];
+  keywords: string[];
+  schema: unknown; // JSON 문자열 또는 객체
+  source_url: string;
+  status: string;
+  created_at: string;
+  updated_at: string | null;
+}
+
 interface ApiDocProps {
-  schema: ApiDocSchema;
+  data: ApiDocData;
 }
 
 interface Properties {
   [key: string]: PropertySchema;
 }
 
-export function ApiDoc({ schema }: ApiDocProps) {
+export function ApiDoc({ data }: ApiDocProps) {
   const [expandedProps, setExpandedProps] = useState<string[]>([]);
+
+  // JSON 문자열을 파싱하여 스키마 객체로 변환
+  const parseSchema = (schemaData: unknown): ApiDocSchema => {
+    try {
+      // 이미 객체인 경우
+      if (typeof schemaData === 'object' && schemaData !== null) {
+        const obj = schemaData as Record<string, unknown>;
+        // schema.schema 구조인 경우
+        if (
+          obj.schema &&
+          typeof obj.schema === 'object' &&
+          obj.schema !== null
+        ) {
+          const nestedSchema = obj.schema as Record<string, unknown>;
+          if (nestedSchema.meta) {
+            return nestedSchema as unknown as ApiDocSchema;
+          }
+        }
+        // 직접 meta가 있는 경우
+        if (obj.meta) {
+          return obj as unknown as ApiDocSchema;
+        }
+      }
+
+      // 문자열인 경우 파싱
+      if (typeof schemaData === 'string') {
+        const parsed = JSON.parse(schemaData);
+        return parsed.meta ? parsed : parsed.schema;
+      }
+
+      // 기본 스키마 반환
+      return {
+        meta: {
+          title: data.title,
+          method: data.method,
+          endpoint: data.endpoint,
+          description: data.description,
+        },
+        headers: [],
+        request: { type: 'object', properties: {} },
+        response: { type: 'object', properties: {} },
+        examples: {
+          request: {},
+          response: { success: {} },
+        },
+      };
+    } catch (e) {
+      console.error('스키마 파싱 오류:', e, schemaData);
+      // 에러 시 기본 스키마 반환
+      return {
+        meta: {
+          title: data.title,
+          method: data.method,
+          endpoint: data.endpoint,
+          description: data.description,
+        },
+        headers: [],
+        request: { type: 'object', properties: {} },
+        response: { type: 'object', properties: {} },
+        examples: {
+          request: {},
+          response: { success: {} },
+        },
+      };
+    }
+  };
+
+  const schema = parseSchema(data.schema);
 
   const toggleProp = (propName: string) => {
     setExpandedProps((prev) =>
@@ -101,14 +187,59 @@ export function ApiDoc({ schema }: ApiDocProps) {
           <code className='font-mono text-gray-700 text-sm'>
             {schema.meta.endpoint}
           </code>
+          {/* Provider 정보 추가 */}
+          <span className='bg-green-100 text-green-600 px-2 py-1 rounded text-sm font-medium'>
+            {data.provider}
+          </span>
         </div>
         <p className='text-gray-600 text-lg whitespace-pre-line'>
           {schema.meta.description}
         </p>
+
+        {/* Tags 표시 */}
+        {data.tags && data.tags.length > 0 && (
+          <div className='flex flex-wrap gap-2 mt-4'>
+            {data.tags.map((tag, index) => (
+              <span
+                key={index}
+                className='bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs'
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-12'>
         <div className='space-y-12'>
+          {/* Headers Section */}
+          {schema.headers && schema.headers.length > 0 && (
+            <section>
+              <h2 className='text-xl font-semibold mb-4'>Headers</h2>
+              <div className='space-y-4'>
+                {schema.headers.map((header, index) => (
+                  <div key={index} className='border-b pb-4'>
+                    <div className='flex items-center gap-3 mb-2'>
+                      <span className='font-mono text-sm text-gray-900'>
+                        {header.name}
+                      </span>
+                      <span className='text-xs px-2 py-0.5 bg-gray-100 rounded-full text-gray-600'>
+                        {header.type}
+                      </span>
+                      {header.required && (
+                        <span className='text-xs text-red-600'>Required</span>
+                      )}
+                    </div>
+                    <p className='text-gray-600 text-sm'>
+                      {header.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Request Section */}
           <section>
             <h2 className='text-xl font-semibold mb-4'>Request</h2>

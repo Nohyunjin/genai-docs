@@ -3,10 +3,54 @@ import { supabase } from '@/shared/lib/supabase';
 import Link from 'next/link';
 
 export default async function Home() {
-  const { data: docs } = await supabase
+  console.log('홈페이지 로딩 시작...');
+
+  const { data: docs, error } = await supabase
     .from('api_docs')
     .select('*')
     .order('updated_at', { ascending: false });
+
+  console.log('Supabase 쿼리 결과:', { docs, error });
+
+  if (error) {
+    console.error('Supabase 오류:', error);
+  }
+
+  // 스키마 파싱 헬퍼 함수
+  const parseSchema = (schemaData: unknown) => {
+    try {
+      // 이미 객체인 경우
+      if (typeof schemaData === 'object' && schemaData !== null) {
+        const obj = schemaData as Record<string, unknown>;
+        // schema.schema 구조인 경우
+        if (
+          obj.schema &&
+          typeof obj.schema === 'object' &&
+          obj.schema !== null
+        ) {
+          const nestedSchema = obj.schema as Record<string, unknown>;
+          if (nestedSchema.meta) {
+            return nestedSchema;
+          }
+        }
+        // 직접 meta가 있는 경우
+        if (obj.meta) {
+          return obj;
+        }
+      }
+
+      // 문자열인 경우 파싱
+      if (typeof schemaData === 'string') {
+        const parsed = JSON.parse(schemaData);
+        return parsed.meta ? parsed : parsed.schema;
+      }
+
+      return null;
+    } catch (e) {
+      console.error('스키마 파싱 오류:', e, schemaData);
+      return null;
+    }
+  };
 
   return (
     <div className='min-h-screen bg-white'>
@@ -44,15 +88,25 @@ export default async function Home() {
             </span>
           </div>
 
+          {error && (
+            <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+              <p className='text-red-600'>
+                데이터를 불러오는 중 오류가 발생했습니다: {error.message}
+              </p>
+            </div>
+          )}
+
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
             {docs?.map((doc) => {
+              const schema = parseSchema(doc.schema);
               const isNew =
+                doc.updated_at &&
                 new Date().getTime() - new Date(doc.updated_at).getTime() <
-                7 * 24 * 60 * 60 * 1000;
+                  7 * 24 * 60 * 60 * 1000;
 
               return (
                 <Link
-                  key={`${doc.provider}-${doc.model}`}
+                  key={doc.id}
                   href={`/docs/${doc.provider}/${doc.model}`}
                   className='group block bg-white rounded-lg border border-gray-200 hover:border-purple-400 transition-all duration-200 hover:shadow-lg'
                 >
@@ -70,17 +124,21 @@ export default async function Home() {
                     </div>
 
                     <h2 className='text-xl font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors'>
-                      {doc.schema.schema.meta.title}
+                      {schema?.meta?.title || doc.title || '제목 없음'}
                     </h2>
 
                     <p className='text-gray-600 text-sm line-clamp-2 mb-4'>
-                      {doc.schema.schema.meta.description}
+                      {schema?.meta?.description ||
+                        doc.description ||
+                        '설명 없음'}
                     </p>
 
                     <div className='flex items-center justify-between text-xs text-gray-500'>
                       <span>
                         마지막 업데이트:{' '}
-                        {new Date(doc.updated_at).toLocaleDateString()}
+                        {doc.updated_at
+                          ? new Date(doc.updated_at).toLocaleDateString()
+                          : '알 수 없음'}
                       </span>
                       <span className='text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity'>
                         자세히 보기 →
@@ -91,6 +149,15 @@ export default async function Home() {
               );
             })}
           </div>
+
+          {docs && docs.length === 0 && (
+            <div className='text-center py-12'>
+              <p className='text-gray-500'>아직 수집된 문서가 없습니다.</p>
+              <p className='text-sm text-gray-400 mt-2'>
+                위의 입력 폼을 사용하여 API 문서를 추가해보세요.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

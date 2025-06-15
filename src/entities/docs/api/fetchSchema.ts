@@ -5,16 +5,24 @@ export interface ApiDoc {
   id: string;
   provider: string;
   model: string;
-  schema: ApiDocSchema;
-  updated_at: string;
+  title: string;
+  description: string;
+  endpoint: string;
+  method: string;
+  tags: string[];
+  keywords: string[];
+  schema: unknown; // JSON 문자열 또는 객체
   source_url: string;
+  status: string;
+  created_at: string;
+  updated_at: string | null;
 }
 
-export async function fetchSchema(
+export async function fetchApiDoc(
   provider: string,
   model: string
-): Promise<ApiDocSchema | null> {
-  console.log('Fetching schema for:', { provider, model });
+): Promise<ApiDoc | null> {
+  console.log('Fetching API doc for:', { provider, model });
 
   // 전체 데이터 조회
   const { data: allDocs } = await supabase
@@ -40,31 +48,53 @@ export async function fetchSchema(
     .maybeSingle();
 
   if (error) {
-    console.error('Error fetching schema:', error);
+    console.error('Error fetching API doc:', error);
     return null;
   }
 
   if (!data) {
-    console.log('No schema found for:', {
+    console.log('No API doc found for:', {
       normalizedProvider,
       normalizedModel,
     });
     return null;
   }
 
-  // schema 구조를 자세히 로깅
-  console.log('Found document schema:', JSON.stringify(data.schema, null, 2));
+  console.log('Found API document:', data);
 
-  // schema가 문자열이면 파싱
-  if (typeof data.schema === 'string') {
-    try {
-      return JSON.parse(data.schema);
-    } catch (e) {
-      console.error('Error parsing schema:', e);
-      return null;
-    }
+  return data as ApiDoc;
+}
+
+// 하위 호환성을 위한 기존 함수 (스키마만 반환)
+export async function fetchSchema(
+  provider: string,
+  model: string
+): Promise<ApiDocSchema | null> {
+  const apiDoc = await fetchApiDoc(provider, model);
+
+  if (!apiDoc) {
+    return null;
   }
 
-  // data.schema.schema가 실제 스키마 데이터
-  return data.schema.schema;
+  // schema 파싱
+  try {
+    if (typeof apiDoc.schema === 'string') {
+      return JSON.parse(apiDoc.schema);
+    }
+
+    if (typeof apiDoc.schema === 'object' && apiDoc.schema !== null) {
+      const schemaObj = apiDoc.schema as Record<string, unknown>;
+      // schema.schema 구조인 경우
+      if (schemaObj.schema) {
+        return schemaObj.schema as ApiDocSchema;
+      }
+      // 직접 스키마인 경우
+      return apiDoc.schema as ApiDocSchema;
+    }
+
+    return null;
+  } catch (e) {
+    console.error('Error parsing schema:', e);
+    return null;
+  }
 }
