@@ -52,47 +52,119 @@ export function UrlInputForm() {
   };
 
   return (
-    <div className='bg-white p-6 rounded-lg border border-gray-200'>
-      <form onSubmit={handleSubmit} className='space-y-4'>
-        <div>
-          <label
-            htmlFor='url'
-            className='block text-sm font-medium text-gray-700 mb-2'
-          >
-            API 문서 URL
-          </label>
-          <div className='flex gap-4'>
-            <input
-              type='url'
-              id='url'
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder='https://platform.openai.com/docs/api-reference/...'
-              className='flex-1 min-w-0 block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm'
-              disabled={isLoading}
-            />
-            <button
-              type='submit'
-              disabled={isLoading}
-              className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed'
+    <div className='bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden'>
+      <div className='p-6 sm:p-8'>
+        <div className='flex items-center gap-3 mb-6'>
+          <div className='w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center'>
+            <svg
+              className='w-5 h-5 text-purple-600'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
             >
-              {isLoading ? '처리 중...' : '문서 수집 요청'}
-            </button>
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1'
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 className='text-lg font-semibold text-gray-900'>
+              API 문서 URL 입력
+            </h3>
+            <p className='text-sm text-gray-500'>
+              수집하고 싶은 API 문서의 URL을 입력해주세요.
+            </p>
           </div>
         </div>
 
-        {error && (
-          <div className='text-sm text-red-600 bg-red-50 p-3 rounded-md'>
-            {error}
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          <div>
+            <div className='flex gap-4'>
+              <input
+                type='url'
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder='https://platform.openai.com/docs/api-reference/...'
+                className='flex-1 min-w-0 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm'
+                disabled={isLoading}
+              />
+              <button
+                type='submit'
+                disabled={isLoading}
+                className='inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
+              >
+                {isLoading ? (
+                  <>
+                    <svg
+                      className='animate-spin -ml-1 mr-2 h-4 w-4 text-white'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                    >
+                      <circle
+                        className='opacity-25'
+                        cx='12'
+                        cy='12'
+                        r='10'
+                        stroke='currentColor'
+                        strokeWidth='4'
+                      />
+                      <path
+                        className='opacity-75'
+                        fill='currentColor'
+                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                      />
+                    </svg>
+                    처리 중...
+                  </>
+                ) : (
+                  '문서 수집 요청'
+                )}
+              </button>
+            </div>
           </div>
-        )}
 
-        {success && (
-          <div className='text-sm text-green-600 bg-green-50 p-3 rounded-md'>
-            {success}
-          </div>
-        )}
-      </form>
+          {error && (
+            <div className='text-sm text-red-600 bg-red-50 p-4 rounded-lg flex items-start gap-3'>
+              <svg
+                className='w-5 h-5 text-red-500 mt-0.5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                />
+              </svg>
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className='text-sm text-green-600 bg-green-50 p-4 rounded-lg flex items-start gap-3'>
+              <svg
+                className='w-5 h-5 text-green-500 mt-0.5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+                />
+              </svg>
+              {success}
+            </div>
+          )}
+        </form>
+      </div>
     </div>
   );
 }
