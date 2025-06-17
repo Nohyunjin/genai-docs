@@ -57,11 +57,10 @@ export const ApiDocList: React.FC<ApiDocListProps> = ({
   initialApiDocs = [],
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [apiDocs, setApiDocs] = useState<APIDocument[]>(initialApiDocs);
   const [loading, setLoading] = useState(initialApiDocs.length === 0);
   const [error, setError] = useState<string | null>(null);
 
-  // 초기 데이터가 없으면 에러 표시 (서버에서 데이터를 가져와야 함)
+  // 초기 데이터가 없으면 에러 표시
   useEffect(() => {
     if (initialApiDocs.length === 0) {
       setError('초기 데이터를 불러올 수 없습니다. 페이지를 새로고침해주세요.');
@@ -75,9 +74,9 @@ export const ApiDocList: React.FC<ApiDocListProps> = ({
 
   const filteredApiDocs = useMemo(() => {
     if (!searchTerm) {
-      return apiDocs;
+      return initialApiDocs;
     }
-    return apiDocs.filter(
+    return initialApiDocs.filter(
       (doc) =>
         doc.provider.toLowerCase().includes(searchTerm) ||
         doc.modelName.toLowerCase().includes(searchTerm) ||
@@ -87,7 +86,7 @@ export const ApiDocList: React.FC<ApiDocListProps> = ({
         doc.description.toLowerCase().includes(searchTerm) ||
         doc.tags.some((tag) => tag.toLowerCase().includes(searchTerm))
     );
-  }, [searchTerm, apiDocs]);
+  }, [searchTerm, initialApiDocs]);
 
   // 로딩 상태
   if (loading) {
@@ -151,7 +150,8 @@ export const ApiDocList: React.FC<ApiDocListProps> = ({
       {filteredApiDocs.length > 0 ? (
         <div className='grid grid-cols-1 gap-6 max-w-3xl mx-auto'>
           <p className='text-center text-neutral-400 mb-4'>
-            {apiDocs.length}개의 API 문서 중 {filteredApiDocs.length}개 표시
+            {initialApiDocs.length}개의 API 문서 중 {filteredApiDocs.length}개
+            표시
           </p>
           {filteredApiDocs.map((doc) => (
             <ApiDocCard key={doc.id} apiDoc={doc} />
@@ -160,12 +160,12 @@ export const ApiDocList: React.FC<ApiDocListProps> = ({
       ) : (
         <div className='text-center py-12'>
           <p className='text-2xl text-neutral-500'>
-            {apiDocs.length === 0
+            {initialApiDocs.length === 0
               ? 'DB에 등록된 API 문서가 없습니다.'
               : 'No APIs found matching your search.'}
           </p>
           <p className='text-neutral-600 mt-2'>
-            {apiDocs.length === 0
+            {initialApiDocs.length === 0
               ? '관리자에게 문의하세요.'
               : 'Try a different keyword or check your spelling.'}
           </p>
