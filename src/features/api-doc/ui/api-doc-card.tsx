@@ -1,6 +1,6 @@
 'use client';
 
-import { APIDocument, HttpMethod } from '@/shared/types/api-doc';
+import { APIDocument, HttpMethod, ProviderInfo } from '@/shared/types/api-doc';
 import Link from 'next/link';
 import React from 'react';
 
@@ -22,7 +22,7 @@ interface ApiDocCardProps {
   apiDoc: APIDocument;
 }
 
-const ProviderLogo: React.FC<{ provider: any }> = ({ provider }) => {
+const ProviderLogo: React.FC<{ provider: ProviderInfo }> = ({ provider }) => {
   // provider.logo가 있으면 사용, 없으면 기본 로직
   if (provider.logo) {
     return <span className='inline-block w-4 h-4 mr-1'>{provider.logo}</span>;
