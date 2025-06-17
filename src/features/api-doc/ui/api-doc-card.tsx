@@ -7,11 +7,13 @@ import React from 'react';
 // API 문서 URL 생성 헬퍼 함수
 function generateApiDocUrl(apiDoc: APIDocument): string {
   const provider = apiDoc.provider.toLowerCase().replace(/\s/g, '');
-  const model = apiDoc.modelName.toLowerCase();
 
-  // URL-safe 형태로 변환
+  // URL-safe 형태로 변환 (점은 유지, 공백은 하이픈으로)
   const cleanProvider = provider.replace(/[^a-z0-9]/g, '');
-  const cleanModel = model.replace(/[^a-z0-9\-]/g, '');
+  const cleanModel = apiDoc.modelName
+    .toLowerCase()
+    .replace(/\s+/g, '-') // 공백을 하이픈으로 변환
+    .replace(/[^a-z0-9\.\-]/g, '');
 
   return `/docs/${cleanProvider}/models/${cleanModel}`;
 }
