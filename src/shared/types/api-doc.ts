@@ -1,3 +1,13 @@
+// Provider 정보를 담는 인터페이스
+export interface ProviderInfo {
+  id: string; // DB의 provider 필드값 (예: 'openai', 'mistralai')
+  name: string; // 표시용 이름 (예: 'OpenAI', 'Mistral AI')
+  category: 'llm' | 'rest' | 'graphql' | 'other';
+  logo?: string; // 로고 URL 또는 이모지
+  color?: string; // 브랜드 컬러
+}
+
+// 기존 호환성을 위한 enum (deprecated)
 export enum APIProvider {
   GOOGLE = 'Google AI',
   OPENAI = 'OpenAI',
@@ -90,7 +100,7 @@ export interface ApiDocSchema {
 
 export interface APIDocument {
   id: string;
-  provider: APIProvider;
+  provider: ProviderInfo; // 동적 provider 정보
   modelName: string;
   serviceName: string;
   endpoint: string;

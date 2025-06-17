@@ -1,12 +1,12 @@
 'use client';
 
-import { APIDocument, APIProvider, HttpMethod } from '@/shared/types/api-doc';
+import { APIDocument, HttpMethod } from '@/shared/types/api-doc';
 import Link from 'next/link';
 import React from 'react';
 
 // API 문서 URL 생성 헬퍼 함수
 function generateApiDocUrl(apiDoc: APIDocument): string {
-  const provider = apiDoc.provider.toLowerCase().replace(/\s/g, '');
+  const provider = apiDoc.provider.id.toLowerCase().replace(/\s/g, '');
 
   // URL-safe 형태로 변환 (점은 유지, 공백은 하이픈으로)
   const cleanProvider = provider.replace(/[^a-z0-9]/g, '');
@@ -22,30 +22,34 @@ interface ApiDocCardProps {
   apiDoc: APIDocument;
 }
 
-const ProviderLogo: React.FC<{ provider: APIProvider }> = ({ provider }) => {
-  switch (provider) {
-    case APIProvider.GOOGLE:
-      return (
-        <span className='inline-block w-4 h-4 mr-1 text-blue-400'>🔵</span>
-      );
-    case APIProvider.OPENAI:
-      return (
-        <span className='inline-block w-4 h-4 mr-1 text-green-400'>🟢</span>
-      );
-    case APIProvider.ANTHROPIC:
-      return (
-        <span className='inline-block w-4 h-4 mr-1 text-orange-400'>🟠</span>
-      );
-    case APIProvider.MISTRAL:
-      return (
-        <span className='inline-block w-4 h-4 mr-1 text-indigo-400'>🟣</span>
-      );
-    case APIProvider.COHERE:
-      return (
-        <span className='inline-block w-4 h-4 mr-1 text-yellow-400'>🟡</span>
-      );
-    default:
-      return <span className='inline-block w-4 h-4 mr-1'>⚪</span>;
+const ProviderLogo: React.FC<{ provider: any }> = ({ provider }) => {
+  // provider.logo가 있으면 사용, 없으면 기본 로직
+  if (provider.logo) {
+    return <span className='inline-block w-4 h-4 mr-1'>{provider.logo}</span>;
+  }
+
+  // 기존 로직 (provider.name 기반)
+  const providerName = provider.name || provider.id || '';
+  const lowerName = providerName.toLowerCase();
+
+  if (lowerName.includes('google')) {
+    return <span className='inline-block w-4 h-4 mr-1 text-blue-400'>🔵</span>;
+  } else if (lowerName.includes('openai')) {
+    return <span className='inline-block w-4 h-4 mr-1 text-green-400'>🟢</span>;
+  } else if (lowerName.includes('anthropic')) {
+    return (
+      <span className='inline-block w-4 h-4 mr-1 text-orange-400'>🟠</span>
+    );
+  } else if (lowerName.includes('mistral')) {
+    return (
+      <span className='inline-block w-4 h-4 mr-1 text-indigo-400'>🟣</span>
+    );
+  } else if (lowerName.includes('cohere')) {
+    return (
+      <span className='inline-block w-4 h-4 mr-1 text-yellow-400'>🟡</span>
+    );
+  } else {
+    return <span className='inline-block w-4 h-4 mr-1'>⚪</span>;
   }
 };
 
@@ -100,7 +104,7 @@ export const ApiDocCard: React.FC<ApiDocCardProps> = ({ apiDoc }) => {
           <div>
             <div className='flex items-center text-sm text-fuchsia-400 mb-1 font-medium'>
               <ProviderLogo provider={apiDoc.provider} />
-              {apiDoc.provider}
+              {apiDoc.provider.name}
             </div>
             <h3 className='text-xl font-semibold text-neutral-50'>
               {apiDoc.modelName}

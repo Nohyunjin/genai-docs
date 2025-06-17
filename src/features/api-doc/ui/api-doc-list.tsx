@@ -78,7 +78,7 @@ export const ApiDocList: React.FC<ApiDocListProps> = ({
     }
     return initialApiDocs.filter(
       (doc) =>
-        doc.provider.toLowerCase().includes(searchTerm) ||
+        doc.provider.name.toLowerCase().includes(searchTerm) ||
         doc.modelName.toLowerCase().includes(searchTerm) ||
         doc.serviceName.toLowerCase().includes(searchTerm) ||
         doc.endpoint.toLowerCase().includes(searchTerm) ||

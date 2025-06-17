@@ -2,9 +2,9 @@
 
 import {
   APIDocument,
-  APIProvider,
   HttpMethod,
   PropertySchema,
+  ProviderInfo,
 } from '@/shared/types/api-doc';
 import { CodeBlock } from '@/shared/ui/code-block';
 import Link from 'next/link';
@@ -95,29 +95,27 @@ const DetailMethodBadge: React.FC<{ method: HttpMethod }> = ({ method }) => {
   );
 };
 
-const ProviderBadge: React.FC<{ provider: APIProvider }> = ({ provider }) => {
+const ProviderBadge: React.FC<{ provider: ProviderInfo }> = ({ provider }) => {
   let colorClasses = 'bg-neutral-700 text-neutral-200';
-  switch (provider) {
-    case APIProvider.GOOGLE:
-      colorClasses = 'bg-sky-600 text-sky-50';
-      break;
-    case APIProvider.OPENAI:
-      colorClasses = 'bg-teal-600 text-teal-50';
-      break;
-    case APIProvider.ANTHROPIC:
-      colorClasses = 'bg-orange-600 text-orange-50';
-      break;
-    case APIProvider.MISTRAL:
-      colorClasses = 'bg-indigo-600 text-indigo-50';
-      break;
-    default:
-      colorClasses = 'bg-slate-600 text-slate-50';
+  const providerName = provider.name.toLowerCase();
+
+  if (providerName.includes('google')) {
+    colorClasses = 'bg-sky-600 text-sky-50';
+  } else if (providerName.includes('openai')) {
+    colorClasses = 'bg-teal-600 text-teal-50';
+  } else if (providerName.includes('anthropic')) {
+    colorClasses = 'bg-orange-600 text-orange-50';
+  } else if (providerName.includes('mistral')) {
+    colorClasses = 'bg-indigo-600 text-indigo-50';
+  } else {
+    colorClasses = 'bg-slate-600 text-slate-50';
   }
+
   return (
     <span
       className={`px-2.5 py-1 text-xs font-semibold rounded-md ${colorClasses}`}
     >
-      {provider}
+      {provider.name}
     </span>
   );
 };

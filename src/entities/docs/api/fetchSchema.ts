@@ -2,8 +2,8 @@ import { supabase } from '@/shared/lib/supabase';
 import {
   ApiDocSchema,
   APIDocument,
-  APIProvider,
   HttpMethod,
+  ProviderInfo,
 } from '@/shared/types/api-doc';
 
 export interface ApiDoc {
@@ -39,23 +39,75 @@ export function pathToSlugArray(path: string): string[] {
   return path.split('/').filter((segment) => segment.length > 0);
 }
 
+// 동적 provider 정보 생성 함수
+function createProviderInfo(providerName: string): ProviderInfo {
+  const normalizedName = providerName.toLowerCase().replace(/\s+/g, '');
+
+  // 알려진 provider들의 정보
+  const knownProviders: Record<string, Omit<ProviderInfo, 'id'>> = {
+    openai: { name: 'OpenAI', category: 'llm', logo: '🟢', color: '#10a37f' },
+    'google ai': {
+      name: 'Google AI',
+      category: 'llm',
+      logo: '🔵',
+      color: '#4285f4',
+    },
+    googleai: {
+      name: 'Google AI',
+      category: 'llm',
+      logo: '🔵',
+      color: '#4285f4',
+    },
+    anthropic: {
+      name: 'Anthropic',
+      category: 'llm',
+      logo: '🟠',
+      color: '#d97706',
+    },
+    'mistral ai': {
+      name: 'Mistral AI',
+      category: 'llm',
+      logo: '🟣',
+      color: '#7c3aed',
+    },
+    mistral: {
+      name: 'Mistral AI',
+      category: 'llm',
+      logo: '🟣',
+      color: '#7c3aed',
+    },
+    mistralai: {
+      name: 'Mistral AI',
+      category: 'llm',
+      logo: '🟣',
+      color: '#7c3aed',
+    },
+    cohere: { name: 'Cohere', category: 'llm', logo: '🟡', color: '#f59e0b' },
+    github: { name: 'GitHub', category: 'rest', logo: '⚫', color: '#24292e' },
+    stripe: { name: 'Stripe', category: 'rest', logo: '🔷', color: '#635bff' },
+    notion: { name: 'Notion', category: 'rest', logo: '⚪', color: '#000000' },
+    slack: { name: 'Slack', category: 'rest', logo: '🟪', color: '#4a154b' },
+  };
+
+  const providerInfo =
+    knownProviders[normalizedName] ||
+    knownProviders[providerName.toLowerCase()];
+
+  return {
+    id: providerName,
+    name: providerInfo?.name || providerName,
+    category: providerInfo?.category || 'other',
+    logo: providerInfo?.logo || '⚪',
+    color: providerInfo?.color || '#6b7280',
+  };
+}
+
 /**
  * DB의 ApiDoc을 UI 컴포넌트용 APIDocument로 변환
  */
 export function transformApiDocToAPIDocument(dbDoc: ApiDoc): APIDocument {
-  // provider를 APIProvider enum으로 변환
-  const providerMap: Record<string, APIProvider> = {
-    openai: APIProvider.OPENAI,
-    'google ai': APIProvider.GOOGLE,
-    google: APIProvider.GOOGLE,
-    anthropic: APIProvider.ANTHROPIC,
-    'mistral ai': APIProvider.MISTRAL,
-    mistral: APIProvider.MISTRAL,
-    cohere: APIProvider.COHERE,
-  };
-
-  const provider =
-    providerMap[dbDoc.provider.toLowerCase()] || APIProvider.OPENAI;
+  // 동적 provider 정보 생성
+  const provider = createProviderInfo(dbDoc.provider);
 
   // method를 HttpMethod enum으로 변환
   const methodMap: Record<string, HttpMethod> = {
@@ -89,7 +141,7 @@ export function transformApiDocToAPIDocument(dbDoc: ApiDoc): APIDocument {
     summary: dbDoc.title,
     description: dbDoc.description,
     tags: dbDoc.tags || [],
-    codeExamples: [], // DB에서 코드 예제는 스키마 안에 있음
+    codeExamples: [],
     lastUpdated: new Date(dbDoc.created_at).toISOString().split('T')[0],
     documentationLink: dbDoc.source_url || undefined,
     schema: parsedSchema,
