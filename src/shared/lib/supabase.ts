@@ -1,7 +1,35 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_ANON_KEY!;
+// 환경변수 검증 함수
+function validateEnvVars() {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-// 서버 사이드에서만 사용되는 클라이언트
-export const supabase = createClient(supabaseUrl, supabaseKey);
+  if (!supabaseUrl) {
+    throw new Error(
+      'SUPABASE_URL is required. Please check your environment variables.'
+    );
+  }
+
+  if (!supabaseKey) {
+    throw new Error(
+      'SUPABASE_ANON_KEY is required. Please check your environment variables.'
+    );
+  }
+
+  return { supabaseUrl, supabaseKey };
+}
+
+// 서버 사이드 Supabase 클라이언트 (싱글톤)
+let _supabase: SupabaseClient | null = null;
+
+export function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    const { supabaseUrl, supabaseKey } = validateEnvVars();
+    _supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return _supabase;
+}
+
+// 기본 export (하위 호환성)
+export const supabase = getSupabase();

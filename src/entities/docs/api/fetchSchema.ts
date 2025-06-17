@@ -1,5 +1,10 @@
 import { supabase } from '@/shared/lib/supabase';
-import { ApiDocSchema } from '../model/types';
+import {
+  ApiDocSchema,
+  APIDocument,
+  APIProvider,
+  HttpMethod,
+} from '@/shared/types/api-doc';
 
 export interface ApiDoc {
   id: string;
@@ -16,35 +21,123 @@ export interface ApiDoc {
   status: string;
   created_at: string;
   updated_at: string | null;
+  // 새로 추가된 필드들
+  slug: string[];
+  path: string;
+  parent_id: string | null;
 }
 
-export async function fetchApiDoc(
-  provider: string,
-  model: string
-): Promise<ApiDoc | null> {
-  console.log('Fetching API doc for:', { provider, model });
+// slug 배열 기반으로 path 생성하는 헬퍼 함수
+export function slugArrayToPath(slugArray: string[]): string {
+  if (!slugArray || slugArray.length === 0) return '/';
+  return '/' + slugArray.join('/');
+}
 
-  // 전체 데이터 조회
-  const { data: allDocs } = await supabase
-    .from('api_docs')
-    .select('provider, model');
+// path에서 slug 배열 추출하는 헬퍼 함수
+export function pathToSlugArray(path: string): string[] {
+  if (!path || path === '/') return [];
+  return path.split('/').filter((segment) => segment.length > 0);
+}
 
-  console.log('All available docs:', allDocs);
+/**
+ * DB의 ApiDoc을 UI 컴포넌트용 APIDocument로 변환
+ */
+export function transformApiDocToAPIDocument(dbDoc: ApiDoc): APIDocument {
+  // provider를 APIProvider enum으로 변환
+  const providerMap: Record<string, APIProvider> = {
+    openai: APIProvider.OPENAI,
+    'google ai': APIProvider.GOOGLE,
+    google: APIProvider.GOOGLE,
+    anthropic: APIProvider.ANTHROPIC,
+    'mistral ai': APIProvider.MISTRAL,
+    mistral: APIProvider.MISTRAL,
+    cohere: APIProvider.COHERE,
+  };
 
-  // 실제 쿼리 실행 전에 파라미터 출력
-  const normalizedProvider = provider.toLowerCase();
-  const normalizedModel = model.toLowerCase();
+  const provider =
+    providerMap[dbDoc.provider.toLowerCase()] || APIProvider.OPENAI;
 
-  console.log('Searching with params:', {
-    normalizedProvider,
-    normalizedModel,
-  });
+  // method를 HttpMethod enum으로 변환
+  const methodMap: Record<string, HttpMethod> = {
+    POST: HttpMethod.POST,
+    GET: HttpMethod.GET,
+    PUT: HttpMethod.PUT,
+    DELETE: HttpMethod.DELETE,
+  };
+
+  const method = methodMap[dbDoc.method.toUpperCase()] || HttpMethod.POST;
+
+  // schema 파싱
+  let parsedSchema: ApiDocSchema | undefined;
+  try {
+    if (typeof dbDoc.schema === 'string') {
+      parsedSchema = JSON.parse(dbDoc.schema);
+    } else if (typeof dbDoc.schema === 'object' && dbDoc.schema !== null) {
+      parsedSchema = dbDoc.schema as ApiDocSchema;
+    }
+  } catch (e) {
+    console.error('Error parsing schema for doc:', dbDoc.id, e);
+  }
+
+  return {
+    id: dbDoc.id,
+    provider,
+    modelName: dbDoc.model,
+    serviceName: dbDoc.title,
+    endpoint: dbDoc.endpoint,
+    method,
+    summary: dbDoc.title,
+    description: dbDoc.description,
+    tags: dbDoc.tags || [],
+    codeExamples: [], // DB에서 코드 예제는 스키마 안에 있음
+    lastUpdated: new Date(dbDoc.created_at).toISOString().split('T')[0],
+    documentationLink: dbDoc.source_url || undefined,
+    schema: parsedSchema,
+  };
+}
+
+/**
+ * DB에서 모든 활성화된 API 문서 목록 가져오기
+ */
+export async function fetchAllApiDocs(): Promise<APIDocument[]> {
+  console.log('Fetching all API docs from database...');
 
   const { data, error } = await supabase
     .from('api_docs')
     .select('*')
-    .eq('provider', normalizedProvider)
-    .eq('model', normalizedModel)
+    .eq('status', 'active')
+    .order('provider', { ascending: true })
+    .order('path', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching API docs:', error);
+    return [];
+  }
+
+  if (!data || data.length === 0) {
+    console.log('No API docs found in database');
+    return [];
+  }
+
+  console.log(`Found ${data.length} API documents in database`);
+
+  // DB 문서를 UI 컴포넌트용 형태로 변환
+  return data.map(transformApiDocToAPIDocument);
+}
+
+// slug 기반 fetch 함수
+export async function fetchApiDocBySlug(
+  provider: string,
+  slugArray: string[]
+): Promise<ApiDoc | null> {
+  const path = slugArrayToPath(slugArray);
+  console.log('Fetching API doc for:', { provider, slugArray, path });
+
+  const { data, error } = await supabase
+    .from('api_docs')
+    .select('*')
+    .eq('provider', provider.toLowerCase())
+    .eq('path', path)
     .maybeSingle();
 
   if (error) {
@@ -53,48 +146,10 @@ export async function fetchApiDoc(
   }
 
   if (!data) {
-    console.log('No API doc found for:', {
-      normalizedProvider,
-      normalizedModel,
-    });
+    console.log('No API doc found for:', { provider, path });
     return null;
   }
 
   console.log('Found API document:', data);
-
   return data as ApiDoc;
-}
-
-// 하위 호환성을 위한 기존 함수 (스키마만 반환)
-export async function fetchSchema(
-  provider: string,
-  model: string
-): Promise<ApiDocSchema | null> {
-  const apiDoc = await fetchApiDoc(provider, model);
-
-  if (!apiDoc) {
-    return null;
-  }
-
-  // schema 파싱
-  try {
-    if (typeof apiDoc.schema === 'string') {
-      return JSON.parse(apiDoc.schema);
-    }
-
-    if (typeof apiDoc.schema === 'object' && apiDoc.schema !== null) {
-      const schemaObj = apiDoc.schema as Record<string, unknown>;
-      // schema.schema 구조인 경우
-      if (schemaObj.schema) {
-        return schemaObj.schema as ApiDocSchema;
-      }
-      // 직접 스키마인 경우
-      return apiDoc.schema as ApiDocSchema;
-    }
-
-    return null;
-  } catch (e) {
-    console.error('Error parsing schema:', e);
-    return null;
-  }
 }

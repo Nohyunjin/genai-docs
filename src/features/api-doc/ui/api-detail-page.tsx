@@ -7,6 +7,7 @@ import {
   PropertySchema,
 } from '@/shared/types/api-doc';
 import { CodeBlock } from '@/shared/ui/code-block';
+import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 
 // Icons
@@ -261,12 +262,12 @@ export const ApiDetailPage: React.FC<ApiDetailPageProps> = ({
   if (!schema) {
     return (
       <div className='max-w-none mx-auto py-2'>
-        <button
-          onClick={handleBackToList}
+        <Link
+          href='/'
           className='mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-fuchsia-600 hover:bg-fuchsia-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-950 focus:ring-fuchsia-500'
         >
           &larr; Back to API List
-        </button>
+        </Link>
         <div className='text-center py-12'>
           <p className='text-2xl text-neutral-500'>
             Detailed documentation not available.
@@ -278,12 +279,12 @@ export const ApiDetailPage: React.FC<ApiDetailPageProps> = ({
 
   return (
     <div className='max-w-none mx-auto py-2'>
-      <button
-        onClick={handleBackToList}
+      <Link
+        href='/'
         className='mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-fuchsia-600 hover:bg-fuchsia-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-950 focus:ring-fuchsia-500'
       >
         &larr; Back to API List
-      </button>
+      </Link>
 
       <div className='mb-10 pb-6 border-b border-neutral-800'>
         <h1 className='text-3xl lg:text-4xl font-bold text-neutral-50 mb-3'>

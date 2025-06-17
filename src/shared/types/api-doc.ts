@@ -28,15 +28,20 @@ export enum HttpMethod {
   DELETE = 'DELETE',
 }
 
+// JSON 값 타입 정의
+type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+type JsonObject = { [key: string]: JsonValue };
+type JsonArray = JsonValue[];
+
 export interface PropertySchema {
   type: string;
   description: string;
   required?: boolean;
-  default?: any;
+  default?: JsonValue;
   properties?: { [key: string]: PropertySchema };
   items?: PropertySchema;
   enum?: string[];
-  example?: any;
+  example?: JsonValue;
 }
 
 export interface HeaderSchema {

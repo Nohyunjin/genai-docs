@@ -1,51 +1,49 @@
 'use client';
 
 import { APIDocument, APIProvider, HttpMethod } from '@/shared/types/api-doc';
+import Link from 'next/link';
 import React from 'react';
+
+// API 문서 URL 생성 헬퍼 함수
+function generateApiDocUrl(apiDoc: APIDocument): string {
+  const provider = apiDoc.provider.toLowerCase().replace(/\s/g, '');
+  const model = apiDoc.modelName.toLowerCase();
+
+  // URL-safe 형태로 변환
+  const cleanProvider = provider.replace(/[^a-z0-9]/g, '');
+  const cleanModel = model.replace(/[^a-z0-9\-]/g, '');
+
+  return `/docs/${cleanProvider}/models/${cleanModel}`;
+}
 
 interface ApiDocCardProps {
   apiDoc: APIDocument;
-  onViewDetails?: (docId: string) => void;
 }
 
-const ProviderLogo: React.FC<{ provider: APIProvider; className?: string }> = ({
-  provider,
-  className = 'w-5 h-5',
-}) => {
-  const baseClasses = `mr-1.5 ${className} font-semibold text-fuchsia-400`;
+const ProviderLogo: React.FC<{ provider: APIProvider }> = ({ provider }) => {
   switch (provider) {
     case APIProvider.GOOGLE:
       return (
-        <span className={baseClasses} title='Google AI'>
-          G
-        </span>
+        <span className='inline-block w-4 h-4 mr-1 text-blue-400'>🔵</span>
       );
     case APIProvider.OPENAI:
       return (
-        <span className={baseClasses} title='OpenAI'>
-          O
-        </span>
+        <span className='inline-block w-4 h-4 mr-1 text-green-400'>🟢</span>
       );
     case APIProvider.ANTHROPIC:
       return (
-        <span className={baseClasses} title='Anthropic'>
-          A
-        </span>
-      );
-    case APIProvider.COHERE:
-      return (
-        <span className={baseClasses} title='Cohere'>
-          C
-        </span>
+        <span className='inline-block w-4 h-4 mr-1 text-orange-400'>🟠</span>
       );
     case APIProvider.MISTRAL:
       return (
-        <span className={baseClasses} title='Mistral AI'>
-          M
-        </span>
+        <span className='inline-block w-4 h-4 mr-1 text-indigo-400'>🟣</span>
+      );
+    case APIProvider.COHERE:
+      return (
+        <span className='inline-block w-4 h-4 mr-1 text-yellow-400'>🟡</span>
       );
     default:
-      return null;
+      return <span className='inline-block w-4 h-4 mr-1'>⚪</span>;
   }
 };
 
@@ -53,51 +51,44 @@ const MethodBadge: React.FC<{ method: HttpMethod; small?: boolean }> = ({
   method,
   small = false,
 }) => {
-  let colorClasses = 'bg-neutral-600 text-neutral-100';
+  let colorClasses = 'bg-neutral-700 text-neutral-200';
   switch (method) {
     case HttpMethod.GET:
-      colorClasses = 'bg-cyan-700 text-cyan-50';
+      colorClasses = 'bg-cyan-600 text-cyan-50';
       break;
     case HttpMethod.POST:
-      colorClasses = 'bg-fuchsia-700 text-fuchsia-50';
+      colorClasses = 'bg-fuchsia-600 text-fuchsia-50';
       break;
     case HttpMethod.PUT:
-      colorClasses = 'bg-pink-700 text-pink-50';
+      colorClasses = 'bg-pink-600 text-pink-50';
       break;
     case HttpMethod.DELETE:
-      colorClasses = 'bg-rose-700 text-rose-50';
+      colorClasses = 'bg-rose-600 text-rose-50';
       break;
   }
-  const sizeClass = small ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm';
+
+  const sizeClasses = small ? 'px-1.5 py-0.5 text-xs' : 'px-2.5 py-1 text-sm';
+
   return (
-    <span className={`${sizeClass} font-semibold rounded-full ${colorClasses}`}>
+    <span className={`${colorClasses} ${sizeClasses} font-semibold rounded-md`}>
       {method}
     </span>
   );
 };
 
-export const ApiDocCard: React.FC<ApiDocCardProps> = ({
-  apiDoc,
-  onViewDetails,
-}) => {
+export const ApiDocCard: React.FC<ApiDocCardProps> = ({ apiDoc }) => {
   const cardBaseClasses =
     'bg-neutral-800 rounded-lg transition-all duration-300 ease-in-out border border-neutral-700 hover:border-fuchsia-500 shadow-md hover:shadow-fuchsia-500/20';
 
-  const handleViewDetailsClick = (e: React.MouseEvent) => {
-    if (onViewDetails) {
-      e.preventDefault();
-      onViewDetails(apiDoc.id);
-    }
-  };
-
+  // URL 네비게이션을 위한 Link 컴포넌트
   const DetailButton = (
-    <button
-      onClick={onViewDetails ? handleViewDetailsClick : undefined}
-      className='px-4 py-2 text-xs font-semibold bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-400 focus:ring-opacity-50'
+    <Link
+      href={generateApiDocUrl(apiDoc)}
+      className='inline-block px-4 py-2 text-xs font-semibold bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-400 focus:ring-opacity-50'
       aria-label={`View details for ${apiDoc.modelName}`}
     >
       View Details
-    </button>
+    </Link>
   );
 
   return (
