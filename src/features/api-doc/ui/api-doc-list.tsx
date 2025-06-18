@@ -1,7 +1,7 @@
 'use client';
 
-import { APIDocument } from '@/shared/types/api-doc';
 import { SearchBar } from '@/features/docs-search/ui/search-bar';
+import { APIDocument } from '@/shared/types/api-doc';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiDocCard } from './api-doc-card';
 
@@ -103,6 +103,8 @@ export const ApiDocList: React.FC<ApiDocListProps> = ({
         <SearchBar
           onSearchChange={handleSearchChange}
           placeholder='Search APIs by provider, model, or description...'
+          hasResults={filteredApiDocs.length > 0}
+          searchTerm={searchTerm}
         />
       </div>
 
