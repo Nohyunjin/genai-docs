@@ -1,53 +1,9 @@
 'use client';
 
 import { APIDocument } from '@/shared/types/api-doc';
+import { SearchBar } from '@/features/docs-search/ui/search-bar';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiDocCard } from './api-doc-card';
-
-// Search Icon
-const SearchIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg
-    className={className}
-    fill='none'
-    stroke='currentColor'
-    viewBox='0 0 24 24'
-  >
-    <path
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      strokeWidth={2}
-      d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-    />
-  </svg>
-);
-
-// Search Bar Component
-const SearchBar: React.FC<{
-  onSearchChange: (searchTerm: string) => void;
-}> = ({ onSearchChange }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    onSearchChange(value);
-  };
-
-  return (
-    <div className='relative'>
-      <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-        <SearchIcon className='h-5 w-5 text-neutral-400' />
-      </div>
-      <input
-        type='text'
-        className='block w-full pl-10 pr-3 py-3 border border-neutral-700 rounded-lg bg-neutral-800 text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent sm:text-sm'
-        placeholder='Search APIs by provider, model, or description...'
-        value={searchTerm}
-        onChange={handleSearchChange}
-      />
-    </div>
-  );
-};
 
 interface ApiDocListProps {
   initialApiDocs?: APIDocument[];
@@ -144,7 +100,10 @@ export const ApiDocList: React.FC<ApiDocListProps> = ({
           Instantly find, understand, and use Generative AI APIs with
           ready-to-use code examples.
         </p>
-        <SearchBar onSearchChange={handleSearchChange} />
+        <SearchBar
+          onSearchChange={handleSearchChange}
+          placeholder='Search APIs by provider, model, or description...'
+        />
       </div>
 
       {filteredApiDocs.length > 0 ? (

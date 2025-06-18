@@ -7,63 +7,9 @@ import {
   ProviderInfo,
 } from '@/shared/types/api-doc';
 import { CodeBlock } from '@/shared/ui/code-block';
+import { ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
-
-// Icons
-const ChevronDownIcon: React.FC<{ className?: string }> = ({
-  className = '',
-}) => (
-  <svg
-    className={className}
-    fill='none'
-    stroke='currentColor'
-    viewBox='0 0 24 24'
-  >
-    <path
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      strokeWidth={2}
-      d='M19 9l-7 7-7-7'
-    />
-  </svg>
-);
-
-const ChevronRightIcon: React.FC<{ className?: string }> = ({
-  className = '',
-}) => (
-  <svg
-    className={className}
-    fill='none'
-    stroke='currentColor'
-    viewBox='0 0 24 24'
-  >
-    <path
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      strokeWidth={2}
-      d='M9 5l7 7-7 7'
-    />
-  </svg>
-);
-
-const ExternalLinkIcon: React.FC<{ className?: string }> = ({
-  className = '',
-}) => (
-  <svg
-    className={className}
-    fill='none'
-    stroke='currentColor'
-    viewBox='0 0 24 24'
-  >
-    <path
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      strokeWidth={2}
-      d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
-    />
-  </svg>
-);
 
 interface ApiDetailPageProps {
   apiDoc: APIDocument;
@@ -239,9 +185,9 @@ export const ApiDetailPage: React.FC<ApiDetailPageProps> = ({
                          px-2 py-1 rounded-md bg-neutral-700 hover:bg-neutral-600 transition-colors'
             >
               {isExpanded ? (
-                <ChevronDownIcon className='w-3 h-3' />
+                <ChevronDown className='w-3 h-3' />
               ) : (
-                <ChevronRightIcon className='w-3 h-3' />
+                <ChevronRight className='w-3 h-3' />
               )}
               <span>{isExpanded ? 'Hide' : 'Show'} nested properties</span>
             </button>
@@ -317,8 +263,7 @@ export const ApiDetailPage: React.FC<ApiDetailPageProps> = ({
             rel='noopener noreferrer'
             className='mt-4 inline-flex items-center text-sm text-fuchsia-400 hover:text-fuchsia-300'
           >
-            Official Documentation{' '}
-            <ExternalLinkIcon className='w-4 h-4 ml-1.5' />
+            Official Documentation <ExternalLink className='w-4 h-4 ml-1.5' />
           </a>
         )}
       </div>
