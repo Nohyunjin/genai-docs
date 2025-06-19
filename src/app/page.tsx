@@ -1,5 +1,5 @@
-import { fetchAllApiDocs } from '@/entities/docs/api/fetchSchema';
 import { ApiDocList } from '@/features/api-doc/ui/api-doc-list';
+import { getCachedAllApiDocs } from '@/shared/utils/cached-fetchers';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   // 서버에서 초기 데이터 로드
-  const initialApiDocs = await fetchAllApiDocs();
+  const initialApiDocs = await getCachedAllApiDocs();
 
   return (
     <div className='min-h-screen bg-neutral-950 text-neutral-100'>

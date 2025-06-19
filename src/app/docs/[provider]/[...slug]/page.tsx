@@ -1,8 +1,6 @@
-import {
-  fetchApiDocBySlug,
-  transformApiDocToAPIDocument,
-} from '@/entities/docs/api/fetchSchema';
+import { transformApiDocToAPIDocument } from '@/entities/docs/api/fetchSchema';
 import { ApiDetailPage } from '@/features/api-doc/ui/api-detail-page';
+import { getCachedApiDoc } from '@/shared/utils/cached-fetchers';
 import { notFound } from 'next/navigation';
 
 type Props = {
@@ -21,7 +19,7 @@ async function DocPage({ params }: Props) {
 
   console.log('DocPage params:', { provider, slug });
 
-  const apiDocData = await fetchApiDocBySlug(provider, slug);
+  const apiDocData = await getCachedApiDoc(provider, slug);
 
   if (!apiDocData) {
     console.log('API doc not found, redirecting to not-found');
@@ -48,7 +46,7 @@ export async function generateMetadata({ params }: Props) {
   const slugPath = slug.length > 0 ? slug.join(' / ') : 'Home';
 
   // API 문서 데이터를 가져와서 더 정확한 메타데이터 생성
-  const apiDocData = await fetchApiDocBySlug(provider, slug);
+  const apiDocData = await getCachedApiDoc(provider, slug);
 
   if (apiDocData) {
     return {
