@@ -1,6 +1,10 @@
 'use client';
 
-import { APIDocument, HttpMethod, ProviderInfo } from '@/shared/types/api-doc';
+import {
+  APIDocument,
+  HttpMethod,
+  ProviderInfo,
+} from '@/00.shared/types/api-doc';
 import Link from 'next/link';
 import React from 'react';
 

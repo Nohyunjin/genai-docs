@@ -1,6 +1,6 @@
-import { transformApiDocToAPIDocument } from '@/entities/docs/api/fetchSchema';
-import { ApiDetailPage } from '@/features/api-doc/ui/api-detail-page';
-import { getCachedApiDoc } from '@/shared/utils/cached-fetchers';
+import { transformApiDocToAPIDocument } from '@/01.entities/docs/api/fetchSchema';
+import { getCachedApiDoc } from '@/02.features/api-docs-fetching';
+import { ApiDetailPage } from '@/04.pages/api-detail';
 import { notFound } from 'next/navigation';
 
 type Props = {

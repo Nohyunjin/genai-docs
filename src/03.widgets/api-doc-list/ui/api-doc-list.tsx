@@ -1,9 +1,9 @@
 'use client';
 
-import { SearchBar } from '@/features/docs-search/ui/search-bar';
-import { APIDocument } from '@/shared/types/api-doc';
+import { APIDocument } from '@/00.shared/types/api-doc';
+import { ApiDocCard } from '@/02.features/api-doc';
+import { SearchBar } from '@/03.widgets/search-bar';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ApiDocCard } from './api-doc-card';
 
 interface ApiDocListProps {
   initialApiDocs?: APIDocument[];

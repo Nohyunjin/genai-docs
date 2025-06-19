@@ -5,8 +5,8 @@ import {
   HttpMethod,
   PropertySchema,
   ProviderInfo,
-} from '@/shared/types/api-doc';
-import { CodeBlock } from '@/shared/ui/code-block';
+} from '@/00.shared/types/api-doc';
+import { CodeBlock } from '@/00.shared/ui/code-block';
 import { ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';

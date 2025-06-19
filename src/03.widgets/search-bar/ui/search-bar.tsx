@@ -1,6 +1,6 @@
 'use client';
 
-import { supabaseClient } from '@/shared/lib/supabase-client';
+import { supabaseClient } from '@/00.shared/lib/supabase-client';
 import { Link, Search, Send } from 'lucide-react';
 import React, { useState } from 'react';
 

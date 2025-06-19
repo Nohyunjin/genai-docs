@@ -1,10 +1,10 @@
-import { supabase } from '@/shared/lib/supabase';
+import { supabase } from '@/00.shared/lib/supabase';
 import {
   ApiDocSchema,
   APIDocument,
   HttpMethod,
   ProviderInfo,
-} from '@/shared/types/api-doc';
+} from '@/00.shared/types/api-doc';
 
 export interface ApiDoc {
   id: string;

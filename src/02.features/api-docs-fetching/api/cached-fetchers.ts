@@ -2,7 +2,7 @@ import {
   fetchAllApiDocs,
   fetchApiDocBySlug,
   type ApiDoc,
-} from '@/entities/docs/api/fetchSchema';
+} from '@/01.entities/docs/api/fetchSchema';
 import { cache } from 'react';
 
 // React cache를 사용한 중복 호출 제거

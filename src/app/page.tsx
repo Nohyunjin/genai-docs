@@ -1,5 +1,5 @@
-import { ApiDocList } from '@/features/api-doc/ui/api-doc-list';
-import { getCachedAllApiDocs } from '@/shared/utils/cached-fetchers';
+import { getCachedAllApiDocs } from '@/02.features/api-docs-fetching';
+import { HomePage } from '@/04.pages/home';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -30,7 +30,7 @@ export default async function Home() {
   return (
     <div className='min-h-screen bg-neutral-950 text-neutral-100'>
       <div className='container mx-auto px-4 py-8'>
-        <ApiDocList initialApiDocs={initialApiDocs} />
+        <HomePage apiDocs={initialApiDocs} />
       </div>
     </div>
   );
