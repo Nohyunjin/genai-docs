@@ -3,7 +3,7 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import * as React from 'react';
 
-import { cn } from '@/00.shared/lib/utils';
+import { cn } from '@/00.shared/lib';
 
 function Tabs({
   className,

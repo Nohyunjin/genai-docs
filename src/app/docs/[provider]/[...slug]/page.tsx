@@ -1,4 +1,3 @@
-import { transformApiDocToAPIDocument } from '@/01.entities/docs/api/fetchSchema';
 import { getCachedApiDoc } from '@/02.features/api-docs-fetching';
 import { ApiDetailPage } from '@/04.pages/api-detail';
 import { notFound } from 'next/navigation';
@@ -19,15 +18,12 @@ async function DocPage({ params }: Props) {
 
   console.log('DocPage params:', { provider, slug });
 
-  const apiDocData = await getCachedApiDoc(provider, slug);
+  const apiDocument = await getCachedApiDoc(provider, slug);
 
-  if (!apiDocData) {
+  if (!apiDocument) {
     console.log('API doc not found, redirecting to not-found');
     notFound();
   }
-
-  // DB 데이터를 APIDocument 형식으로 변환
-  const apiDocument = transformApiDocToAPIDocument(apiDocData);
 
   // ApiDetailPage 컴포넌트 사용 (다크 테마 래퍼 포함)
   return (
@@ -46,16 +42,16 @@ export async function generateMetadata({ params }: Props) {
   const slugPath = slug.length > 0 ? slug.join(' / ') : 'Home';
 
   // API 문서 데이터를 가져와서 더 정확한 메타데이터 생성
-  const apiDocData = await getCachedApiDoc(provider, slug);
+  const apiDocument = await getCachedApiDoc(provider, slug);
 
-  if (apiDocData) {
+  if (apiDocument) {
     return {
-      title: `${apiDocData.title} - ${provider} API Documentation`,
-      description: apiDocData.description,
-      keywords: apiDocData.keywords?.join(', '),
+      title: `${apiDocument.serviceName} - ${provider} API Documentation`,
+      description: apiDocument.description,
+      keywords: apiDocument.tags?.join(', '),
       openGraph: {
-        title: `${apiDocData.title} - ${provider} API`,
-        description: apiDocData.description,
+        title: `${apiDocument.serviceName} - ${provider} API`,
+        description: apiDocument.description,
         type: 'website',
       },
     };

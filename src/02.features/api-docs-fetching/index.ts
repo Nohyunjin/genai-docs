@@ -1,1 +1,11 @@
-export { getCachedAllApiDocs, getCachedApiDoc } from './api/cached-fetchers';
+export {
+  getCachedAllApiDocs,
+  getCachedApiDoc,
+  getCachedRawAllApiDocs,
+  getCachedRawApiDoc,
+} from './api/cached-fetchers';
+
+export {
+  transformApiDocsToAPIDocuments,
+  transformApiDocToAPIDocument,
+} from './lib/transformers';

@@ -9,22 +9,6 @@ export function generateApiDocUrl(provider: string, slug: string[]): string {
 }
 
 /**
- * path에서 slug 배열 추출
- */
-export function pathToSlugArray(path: string): string[] {
-  if (!path || path === '/') return [];
-  return path.split('/').filter((segment) => segment.length > 0);
-}
-
-/**
- * slug 배열에서 path 생성
- */
-export function slugArrayToPath(slugArray: string[]): string {
-  if (!slugArray || slugArray.length === 0) return '/';
-  return '/' + slugArray.join('/');
-}
-
-/**
  * 계층적 네비게이션을 위한 breadcrumb 생성
  */
 export function generateBreadcrumbs(provider: string, slug: string[]) {
@@ -81,28 +65,6 @@ export function getAvailableCategories(provider: string): string[] {
   );
 
   return [...new Set(allCategories)];
-}
-
-/**
- * URL slug를 읽기 쉬운 제목으로 변환
- */
-export function slugToTitle(slug: string): string {
-  return slug
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
-
-/**
- * 제목을 URL slug로 변환
- */
-export function titleToSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') // 특수문자 제거
-    .replace(/\s+/g, '-') // 공백을 하이픈으로
-    .replace(/-+/g, '-') // 연속 하이픈 제거
-    .trim();
 }
 
 /**
