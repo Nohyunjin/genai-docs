@@ -3,13 +3,13 @@
 import { APIDocument } from '@/00.shared/types/api-doc';
 import { ApiDocList } from '@/03.widgets/api-doc-list';
 import { SearchBar } from '@/03.widgets/search-bar';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface HomePageProps {
   apiDocs: APIDocument[];
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ apiDocs }) => {
+export function HomePage({ apiDocs }: HomePageProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,4 +77,4 @@ export const HomePage: React.FC<HomePageProps> = ({ apiDocs }) => {
       <ApiDocList apiDocs={filteredApiDocs} loading={loading} error={error} />
     </>
   );
-};
+}

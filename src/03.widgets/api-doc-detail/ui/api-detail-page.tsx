@@ -5,17 +5,14 @@ import { CodeBlock } from '@/00.shared/ui/code-block';
 import { DetailMethodBadge, ProviderBadge } from '@/02.features/api-doc-detail';
 import { ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface ApiDetailPageProps {
   apiDoc: APIDocument;
   onBack?: () => void;
 }
 
-export const ApiDetailPage: React.FC<ApiDetailPageProps> = ({
-  apiDoc,
-  onBack,
-}) => {
+export function ApiDetailPage({ apiDoc, onBack }: ApiDetailPageProps) {
   const [expandedProps, setExpandedProps] = useState<string[]>([]);
   const schema = apiDoc.schema;
 
@@ -338,4 +335,4 @@ export const ApiDetailPage: React.FC<ApiDetailPageProps> = ({
       </div>
     </div>
   );
-};
+}

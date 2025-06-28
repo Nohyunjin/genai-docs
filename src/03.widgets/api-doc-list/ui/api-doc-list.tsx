@@ -2,7 +2,6 @@
 
 import { APIDocument } from '@/00.shared/types/api-doc';
 import { ApiDocCard } from '@/02.features/api-doc-list';
-import React from 'react';
 
 interface ApiDocListProps {
   apiDocs: APIDocument[];
@@ -10,11 +9,11 @@ interface ApiDocListProps {
   error?: string | null;
 }
 
-export const ApiDocList: React.FC<ApiDocListProps> = ({
+export function ApiDocList({
   apiDocs,
   loading = false,
   error = null,
-}) => {
+}: ApiDocListProps) {
   // 로딩 상태
   if (loading) {
     return (
@@ -60,4 +59,4 @@ export const ApiDocList: React.FC<ApiDocListProps> = ({
       <p className='text-neutral-600 mt-2'>다른 키워드로 검색해보세요.</p>
     </div>
   );
-};
+}

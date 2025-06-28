@@ -6,7 +6,6 @@ import {
   ProviderInfo,
 } from '@/00.shared/types/api-doc';
 import Link from 'next/link';
-import React from 'react';
 
 // API 문서 URL 생성 헬퍼 함수
 function generateApiDocUrl(apiDoc: APIDocument): string {
@@ -26,7 +25,7 @@ interface ApiDocCardProps {
   apiDoc: APIDocument;
 }
 
-const ProviderLogo: React.FC<{ provider: ProviderInfo }> = ({ provider }) => {
+function ProviderLogo({ provider }: { provider: ProviderInfo }) {
   // provider.logo가 있으면 사용, 없으면 기본 로직
   if (provider.logo) {
     return <span className='inline-block w-4 h-4 mr-1'>{provider.logo}</span>;
@@ -55,12 +54,15 @@ const ProviderLogo: React.FC<{ provider: ProviderInfo }> = ({ provider }) => {
   } else {
     return <span className='inline-block w-4 h-4 mr-1'>⚪</span>;
   }
-};
+}
 
-const MethodBadge: React.FC<{ method: HttpMethod; small?: boolean }> = ({
+function MethodBadge({
   method,
   small = false,
-}) => {
+}: {
+  method: HttpMethod;
+  small?: boolean;
+}) {
   let colorClasses = 'bg-neutral-700 text-neutral-200';
   switch (method) {
     case HttpMethod.GET:
@@ -84,9 +86,9 @@ const MethodBadge: React.FC<{ method: HttpMethod; small?: boolean }> = ({
       {method}
     </span>
   );
-};
+}
 
-export const ApiDocCard: React.FC<ApiDocCardProps> = ({ apiDoc }) => {
+export function ApiDocCard({ apiDoc }: ApiDocCardProps) {
   const cardBaseClasses =
     'bg-neutral-800 rounded-lg transition-all duration-300 ease-in-out border border-neutral-700 hover:border-fuchsia-500 shadow-md hover:shadow-fuchsia-500/20';
 
@@ -159,4 +161,4 @@ export const ApiDocCard: React.FC<ApiDocCardProps> = ({ apiDoc }) => {
       </div>
     </div>
   );
-};
+}

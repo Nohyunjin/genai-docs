@@ -2,7 +2,7 @@
 
 import { supabaseClient } from '@/00.shared/lib/supabase-client';
 import { Link, Search, Send } from 'lucide-react';
-import React, { useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 
 interface SearchBarProps {
   onSearchChange: (searchTerm: string) => void;
@@ -11,12 +11,12 @@ interface SearchBarProps {
   searchTerm?: string;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({
+export const SearchBar = ({
   onSearchChange,
   placeholder = 'Search...',
   hasResults = true,
   searchTerm: externalSearchTerm,
-}) => {
+}: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [crawlUrl, setCrawlUrl] = useState('');
   const [showCrawlForm, setShowCrawlForm] = useState(false);
@@ -26,13 +26,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     text: string;
   } | null>(null);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
     onSearchChange(value);
   };
 
-  const handleCrawlRequest = async (e: React.FormEvent) => {
+  const handleCrawlRequest = async (e: FormEvent) => {
     e.preventDefault();
     if (!crawlUrl.trim()) return;
 

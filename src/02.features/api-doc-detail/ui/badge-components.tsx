@@ -1,9 +1,6 @@
 import { HttpMethod, ProviderInfo } from '@/00.shared/types/api-doc';
-import React from 'react';
 
-export const DetailMethodBadge: React.FC<{ method: HttpMethod }> = ({
-  method,
-}) => {
+export function DetailMethodBadge({ method }: { method: HttpMethod }) {
   let colorClasses = 'bg-neutral-700 text-neutral-200';
   switch (method) {
     case HttpMethod.GET:
@@ -26,11 +23,9 @@ export const DetailMethodBadge: React.FC<{ method: HttpMethod }> = ({
       {method}
     </span>
   );
-};
+}
 
-export const ProviderBadge: React.FC<{ provider: ProviderInfo }> = ({
-  provider,
-}) => {
+export function ProviderBadge({ provider }: { provider: ProviderInfo }) {
   let colorClasses = 'bg-neutral-700 text-neutral-200';
   const providerName = provider.name.toLowerCase();
 
@@ -53,4 +48,4 @@ export const ProviderBadge: React.FC<{ provider: ProviderInfo }> = ({
       {provider.name}
     </span>
   );
-};
+}
